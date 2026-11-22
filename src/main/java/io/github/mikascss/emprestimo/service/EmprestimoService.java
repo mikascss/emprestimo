@@ -8,6 +8,7 @@ import io.github.mikascss.emprestimo.model.Emprestimo;
 import io.github.mikascss.emprestimo.model.Equipamento;
 import io.github.mikascss.emprestimo.model.ResultModel;
 import io.github.mikascss.emprestimo.repository.EmprestimoRepository;
+import io.github.mikascss.emprestimo.repository.EquipamentoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,6 @@ public class EmprestimoService {
     private final EmprestimoRepository emprestimoRepository;
     private final EquipamentoService equipamentoService;
     private final ColaboradorService colaboradorService;
-
-    private static final int PRAZO_EM_DIAS = 14;
 
     public EmprestimoService(EmprestimoRepository emprestimoRepository,
                              EquipamentoService equipamentoService,
@@ -52,18 +51,22 @@ public class EmprestimoService {
         Equipamento equipamento = equipamentoService.buscar(pedido.equipamentoId()).getBody().getDados();
         Colaborador colaborador = colaboradorService.buscar(pedido.colaboradorId()).getBody().getDados();
 
+        verificarSeColaboradorTemEmprestimoAtrasado(pedido.colaboradorId());
+
         if(!equipamento.isDisponivel()){
             throw new ConflitoException("Equipamento indisponível.");
         }
-        equipamento.setDisponivel(false);
 
         LocalDate dtAtual = LocalDate.now();
+
+        int prazo = equipamento.getTipo().getPrazoEmDias();
 
         Emprestimo emprestimo = new Emprestimo();
         emprestimo.setEquipamento(equipamento);
         emprestimo.setColaborador(colaborador);
         emprestimo.setDataEmprestimo(dtAtual);
-        emprestimo.setDataPrevistaDevolucao(dtAtual.plusDays(PRAZO_EM_DIAS));
+        emprestimo.setDataPrevistaDevolucao(dtAtual.plusDays(prazo));
+        emprestimo.getEquipamento().setDisponivel(false);
 
         return ResultModel.resultSucesso(HttpStatus.CREATED, emprestimoRepository.save(emprestimo));
     }
@@ -88,5 +91,16 @@ public class EmprestimoService {
             return ResultModel.resultSucesso(HttpStatus.OK, emprestimosAtrasados);
         }
         return ResultModel.resultSucesso(HttpStatus.OK, emprestimoRepository.findAll());
+    }
+
+    private void verificarSeColaboradorTemEmprestimoAtrasado(Long colaboradorId){
+        List<Emprestimo> emprestimosPorColaborador = emprestimoRepository.findByColaboradorId(colaboradorId);
+        if(!emprestimosPorColaborador.isEmpty()){
+            for(Emprestimo e : emprestimosPorColaborador){
+                if(e.isAtrasado()){
+                    throw new ConflitoException("Esse colaborador está com empréstimo atrasado.");
+                }
+            }
+        }
     }
 }

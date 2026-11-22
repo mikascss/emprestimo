@@ -1,12 +1,13 @@
 package io.github.mikascss.emprestimo.controller;
 
+import io.github.mikascss.emprestimo.dto.equipamento.EquipamentoRegisterRequest;
+import io.github.mikascss.emprestimo.dto.equipamento.EquipamentoUpdateRequest;
 import io.github.mikascss.emprestimo.model.Equipamento;
 import io.github.mikascss.emprestimo.model.ResultModel;
 import io.github.mikascss.emprestimo.model.TipoEquipamento;
 import io.github.mikascss.emprestimo.service.EquipamentoService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +47,7 @@ public class EquipamentoController {
 
     @PostMapping
     public ResponseEntity<ResultModel<Equipamento>> cadastrar(
-            @RequestBody @Valid Equipamento equipamento
+            @RequestBody @Valid EquipamentoRegisterRequest equipamento
     ){
         return equipamentoService.cadastrar(equipamento);
     }
@@ -54,7 +55,7 @@ public class EquipamentoController {
     @PutMapping("/{id}")
     public ResponseEntity<ResultModel<Equipamento>> atualizar(
             @PathVariable Long id,
-            @RequestBody @Valid Equipamento dados
+            @RequestBody @Valid EquipamentoUpdateRequest dados
     ){
         return equipamentoService.atualizar(id, dados);
     }

@@ -1,8 +1,9 @@
 package io.github.mikascss.emprestimo.service;
 
+import io.github.mikascss.emprestimo.dto.equipamento.EquipamentoRegisterRequest;
+import io.github.mikascss.emprestimo.dto.equipamento.EquipamentoUpdateRequest;
 import io.github.mikascss.emprestimo.exception.ConflitoException;
 import io.github.mikascss.emprestimo.exception.NaoEncontradoException;
-import io.github.mikascss.emprestimo.model.Emprestimo;
 import io.github.mikascss.emprestimo.model.Equipamento;
 import io.github.mikascss.emprestimo.model.ResultModel;
 import io.github.mikascss.emprestimo.model.TipoEquipamento;
@@ -11,7 +12,6 @@ import io.github.mikascss.emprestimo.repository.EquipamentoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -49,19 +49,22 @@ public class EquipamentoService {
         return ResultModel.resultSucesso(HttpStatus.OK, equipamento);
     }
 
-    public ResponseEntity<ResultModel<Equipamento>> cadastrar(Equipamento equipamento) {
-        if(equipamentoRepository.existsByPatrimonio(equipamento.getPatrimonio())){
+    public ResponseEntity<ResultModel<Equipamento>> cadastrar(EquipamentoRegisterRequest cadastro) {
+        if(equipamentoRepository.existsByPatrimonio(cadastro.patrimonio())){
             throw new ConflitoException("Patrimônio já cadastrado.");
         }
-        equipamento.setDisponivel(true);
+        Equipamento equipamento = new Equipamento();
+        equipamento.setNome(cadastro.nome());
+        equipamento.setPatrimonio(cadastro.patrimonio());
+        equipamento.setTipo(cadastro.tipo());
 
         return ResultModel.resultSucesso(HttpStatus.CREATED, equipamentoRepository.save(equipamento));
     }
 
-    public ResponseEntity<ResultModel<Equipamento>> atualizar(Long id, Equipamento dados){
+    public ResponseEntity<ResultModel<Equipamento>> atualizar(Long id, EquipamentoUpdateRequest dados){
         Equipamento equipamento = buscar(id).getBody().getDados();
-        equipamento.setNome(dados.getNome());
-        equipamento.setTipo(dados.getTipo());
+        equipamento.setNome(dados.nome());
+        equipamento.setTipo(dados.tipo());
         return ResultModel.resultSucesso(HttpStatus.OK, equipamentoRepository.save(equipamento));
     }
 

@@ -31,16 +31,5 @@ public class Colaborador {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "O CEP é obrigatório")
-    @Pattern(regexp = "\\d{8}", message = "O CEP deve ter 8 dígitos, sem traço")
-    private String cep;
-
-    @NotBlank(message = "O número é obrigatório")
-    @Column(nullable = false)
-    private String numero;
-
-    private String logradouro,
-                    bairro,
-                    cidade,
-                    uf;
+    private String cargo;
 }
