@@ -49,6 +49,7 @@ public class TratadorDeErros {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErroResposta handleJsonInvalido(
             HttpMessageNotReadableException ex) {
 

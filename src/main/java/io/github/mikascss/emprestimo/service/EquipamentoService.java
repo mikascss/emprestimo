@@ -70,9 +70,12 @@ public class EquipamentoService {
 
     public ResponseEntity<ResultModel<Void>> remover(Long id){
         Equipamento equipamento = buscar(id).getBody().getDados();
+        
         if(emprestimoRepository.existsByEquipamentoId(id)){
             throw new ConflitoException("Equipamento tem empréstimos registrados.");
         }
+
+        equipamentoRepository.deleteById(id);
 
         return ResultModel.resultSucesso(HttpStatus.NO_CONTENT);
     }
