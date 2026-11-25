@@ -182,3 +182,7 @@ src/main/resources/application.properties
 src/test/java/io/github/mikascss/emprestimo/
 ```
 
+## Demonstração
+
+**Vídeo do projeto:** [link da apresentação](https://drive.google.com/file/d/1EpfhD76tITzhX9T-yxD46R9LMjqYrVSP/view?usp=sharing)
+**link de deploy:** [link da aplicação](https://emprestimo-lllu.onrender.com)
